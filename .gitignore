@@ -1,3 +1,4 @@
+
 # Logs
 logs
 *.log
@@ -54,7 +55,6 @@ web_modules/
 # Optional eslint cache
 .eslintcache
 .idea
-
 # Optional stylelint cache
 .stylelintcache
 
@@ -129,3 +129,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+/node_modules/

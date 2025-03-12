@@ -47,14 +47,35 @@ Error Checking
 
 * */
 
+import {describe, it} from "node:test";
+
 export function isInteresting(n: number, awesomePhrases: number[]): number {
     if (n < 100) {
         return 0;
     }
-    if (awesomePhrases.includes(n)) {
-        return 2;
-    }
 
+    const isAwesome = (n: number) => awesomePhrases.includes(n);
+    const predicates = [
+        isIncrementing,
+        isDecrementing,
+        isPalindrome,
+        hasAllTheSame,
+        hasAllZeros,
+        isAwesome
+    ];
+
+    return predicates.reduce((accum, predicate) => {
+        if (accum === 2) {
+            return accum;
+        }
+        if (executePredicate(n, predicate) === 2) {
+            return 2;
+        }
+        if (executePredicate(n, predicate) === 1 && accum !== 2) {
+            return 1;
+        }
+        return accum;
+    }, 0);
 }
 
 const hasAllZeros = (n: number): boolean => Number(n.toString().slice(1)) === 0;
@@ -63,10 +84,51 @@ const isIncrementing = (n: number): boolean => n.toString().split("").reduce((ac
     if (currentIndex === 0) {
         return accum;
     }
-    if(element === "0"){
-
+    if (element === "1" && arr[currentIndex - 1] === "0") {
+        return false;
+    }
+    if (element === "0" && arr[currentIndex - 1] === "9") {
+        return true;
     }
     return accum ? Number(element) === Number(arr[currentIndex - 1]) + 1 : accum;
 }, true);
+const isDecrementing = (n: number): boolean => n.toString().split("").reduce((accum, element, currentIndex, arr) => {
+    if (currentIndex === 0) {
+        return accum;
+    }
+    if (element === "9" && arr[currentIndex - 1] === "0") {
+        return false;
+    }
+    return accum ? Number(element) === Number(arr[currentIndex - 1]) - 1 : accum;
+}, true);
+const isPalindrome = (n: number): boolean => n.toString().split("").every((x, index, arr) => {
+    return arr.length % 2 !== 0 && Math.floor(arr.length % 2) === index ? true : x === arr[arr.length - index - 1];
+})
+const executePredicate = (n: number, predicate: (x: number) => boolean): 0 | 1 | 2 => {
+    if (predicate(n)) {
+        return 2;
+    }
+    if (predicate(n + 1) || predicate(n + 2)) {
+        return 1;
+    }
+    return 0
+}
 
-console.log(isIncrementing(123))
+console.log(isPalindrome(7987))
+
+import {assert} from "chai";
+
+function test(n: number, awesome: number[], expected: number) {
+    assert.strictEqual(isInteresting(n, awesome), expected);
+}
+
+describe("solution", function () {
+    it('should work, dangit!', function () {
+        test(3, [1337, 256], 0);
+        test(1336, [1337, 256], 1);
+        // test(1337, [1337, 256],  2);
+        // test(11208, [1337, 256], 0);
+        // test(11209, [1337, 256], 1);
+        // test(11211, [1337, 256], 2);
+    });
+});
